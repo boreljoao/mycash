@@ -2,62 +2,76 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#f7f8fa">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#153a2b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Meu Caixa">
   <title>Meu Caixa — Gestão Financeira</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
     <a class="brand" href="#"><span class="brand-mark">M</span><span>meucaixa</span></a>
     <nav id="nav">
-      <button class="nav-item active" data-page="dashboard"><span>⌂</span> Meu Caixa</button>
+      <button class="nav-item active" data-page="dashboard"><span>⌂</span> Visão geral</button>
       <button class="nav-item" data-page="transactions"><span>↕</span> Movimentações</button>
-      <button class="nav-item" data-page="accounts"><span>▣</span> Contas</button>
-      <button class="nav-item" data-page="cards"><span>▱</span> Cartões</button>
-      <button class="nav-item" data-page="budget"><span>◎</span> Orçamento</button>
+      <button class="nav-item" data-page="expenses"><span>◎</span> Gastos &amp; Contas</button>
+      <button class="nav-item" data-page="accounts"><span>▣</span> Contas &amp; Cartões</button>
       <button class="nav-item" data-page="investments"><span>⌁</span> Investimentos</button>
+      <button class="nav-item" data-page="settings"><span>⚙</span> Ajustes &amp; Sincronização</button>
     </nav>
     <div class="sidebar-bottom">
-      <button class="nav-item" id="exportBtn"><span>⇩</span> Exportar dados</button>
-      <button class="profile"><span class="avatar">MC</span><span><strong>Minha conta</strong><small>Conta pessoal</small></span><span>⋯</span></button>
+      <div class="sync-badge" id="syncBadge"><i></i><span>Somente neste aparelho</span></div>
+      <button class="nav-item" id="exportBtn"><span>⇩</span> Exportar backup</button>
     </div>
   </aside>
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
   <main>
     <header class="topbar">
-      <button class="mobile-menu" id="menuBtn">☰</button>
-      <div>
-        <p class="eyebrow">VISÃO GERAL</p>
+      <button class="mobile-menu" id="menuBtn" aria-label="Menu">☰</button>
+      <div class="topbar-title">
+        <p class="eyebrow" id="pageEyebrow">VISÃO GERAL</p>
         <h1 id="pageTitle">Meu Caixa</h1>
       </div>
+      <div class="month-nav" id="monthNav">
+        <button class="icon-btn" id="prevMonth" aria-label="Mês anterior">‹</button>
+        <button class="month-label" id="monthLabel">Setembro 2026</button>
+        <button class="icon-btn" id="nextMonth" aria-label="Próximo mês">›</button>
+      </div>
       <div class="top-actions">
-        <button class="icon-btn" aria-label="Notificações">◌<span class="dot"></span></button>
-        <button class="btn secondary" id="importBtn">⇧ Importar fatura</button>
+        <button class="btn secondary" id="importBtn">⇧ Importar CSV</button>
+        <button class="btn voice" id="voiceBtn" title="Adicionar por voz">🎤 Falar</button>
         <button class="btn primary" id="newTransactionBtn">＋ Nova movimentação</button>
       </div>
     </header>
 
+    <!-- ================= DASHBOARD ================= -->
     <section class="page active" id="dashboard">
       <div class="hero-grid">
         <article class="balance-card">
-          <div class="card-head"><span>Patrimônio total</span><button class="ghost" id="toggleBalance">◉</button></div>
-          <div class="balance" data-money="128400">R$ 128.400,00</div>
-          <div class="change positive">↗ R$ 8.400 <span>nos últimos 30 dias</span></div>
+          <div class="card-head"><span>Patrimônio total</span><button class="ghost" id="toggleBalance" title="Ocultar valores">◉</button></div>
+          <div class="balance money" id="netWorth">R$ 0,00</div>
+          <div class="change" id="netWorthChange"></div>
           <div class="balance-breakdown">
-            <div><small>Caixa disponível</small><strong>R$ 74.900</strong></div>
-            <div><small>Investimentos</small><strong>R$ 239.500</strong></div>
+            <div><small>Caixa disponível</small><strong class="money" id="cashTotal">R$ 0,00</strong></div>
+            <div><small>Investimentos</small><strong class="money" id="investTotalHero">R$ 0,00</strong></div>
+            <div><small>Faturas em aberto</small><strong class="money" id="cardsOpenHero">R$ 0,00</strong></div>
           </div>
         </article>
         <article class="projection-card">
-          <div class="card-head"><span>Projeção do patrimônio</span><span class="pill">12 meses</span></div>
-          <div class="projection-value">R$ 256.000</div>
-          <p>Considerando sua geração média atual</p>
-          <div class="progress"><i style="width:68%"></i></div>
-          <div class="progress-labels"><span>Hoje · R$ 128 mil</span><span>Meta · R$ 250 mil</span></div>
+          <div class="card-head"><span>Meta de patrimônio</span><button class="pill-btn" id="editGoalBtn">Editar meta</button></div>
+          <div class="projection-value money" id="projectionValue">R$ 0,00</div>
+          <p id="projectionNote">Projeção em 12 meses considerando sua média mensal</p>
+          <div class="progress"><i id="goalProgress" style="width:0%"></i></div>
+          <div class="progress-labels"><span id="goalNow">Hoje · —</span><span id="goalTarget">Meta · —</span></div>
         </article>
       </div>
 
@@ -70,15 +84,14 @@
             <select id="chartPeriod"><option value="6">Últimos 6 meses</option><option value="12">Últimos 12 meses</option></select>
           </div>
           <div class="chart-wrap">
-            <div class="chart-summary"><strong>R$ 223.700</strong><span class="positive">+21,4%</span></div>
+            <div class="chart-summary"><strong class="money" id="chartNow">R$ 0</strong><span id="chartDelta" class="positive">—</span></div>
             <svg id="cashChart" viewBox="0 0 700 240" role="img" aria-label="Gráfico de evolução do caixa"></svg>
           </div>
         </article>
-
         <article class="panel categories-panel">
-          <div class="panel-head"><div><h2>Gastos por categoria</h2><p>Setembro de 2026</p></div><button class="ghost">•••</button></div>
+          <div class="panel-head"><div><h2>Gastos por categoria</h2><p id="categoriesMonth">—</p></div><button class="link-btn" data-go="expenses">Detalhes →</button></div>
           <div class="donut-area">
-            <div class="donut"><div><strong>R$ 7,9k</strong><small>Total</small></div></div>
+            <div class="donut" id="donut"><div><strong class="money" id="donutTotal">R$ 0</strong><small>Total</small></div></div>
             <div class="legend" id="categoryLegend"></div>
           </div>
         </article>
@@ -90,80 +103,325 @@
           <div class="transaction-list" id="recentTransactions"></div>
         </article>
         <article class="panel bills-panel">
-          <div class="panel-head"><div><h2>Próximos compromissos</h2><p>Faturas e contas a vencer</p></div></div>
+          <div class="panel-head"><div><h2>Próximos compromissos</h2><p>Contas e faturas a vencer</p></div><button class="link-btn" data-go="expenses">Gerenciar →</button></div>
           <div id="upcomingBills"></div>
         </article>
       </div>
     </section>
 
+    <!-- ================= MOVIMENTAÇÕES ================= -->
     <section class="page" id="transactions">
+      <div class="summary-strip" id="txSummary"></div>
       <div class="section-toolbar">
-        <div class="filters"><input id="searchInput" placeholder="Buscar movimentação..."><select id="typeFilter"><option value="">Todos os tipos</option><option value="income">Entradas</option><option value="expense">Saídas</option><option value="transfer">Transferências</option></select></div>
+        <div class="filters">
+          <input id="searchInput" placeholder="🔍 Buscar por descrição, categoria ou conta…">
+          <select id="typeFilter"><option value="">Todos os tipos</option><option value="income">Entradas</option><option value="expense">Saídas</option><option value="transfer">Transferências</option></select>
+          <select id="categoryFilter"><option value="">Todas as categorias</option></select>
+          <select id="accountFilter"><option value="">Todas as contas</option></select>
+          <label class="check-inline"><input type="checkbox" id="allMonths"> Todos os meses</label>
+        </div>
         <span class="results-count" id="resultsCount"></span>
       </div>
-      <article class="panel data-panel"><div class="table-scroll"><table><thead><tr><th>Descrição</th><th>Categoria</th><th>Conta</th><th>Data</th><th class="right">Valor</th><th></th></tr></thead><tbody id="transactionsTable"></tbody></table></div></article>
+      <article class="panel data-panel">
+        <div class="table-scroll"><table><thead><tr><th>Descrição</th><th>Categoria</th><th>Conta / Cartão</th><th>Data</th><th class="right">Valor</th><th></th></tr></thead><tbody id="transactionsTable"></tbody></table></div>
+        <div class="mobile-list" id="transactionsMobile"></div>
+      </article>
     </section>
 
+    <!-- ================= GASTOS & CONTAS ================= -->
+    <section class="page" id="expenses">
+      <div class="budget-summary" id="expenseSummary"></div>
+
+      <div class="content-grid equal">
+        <article class="panel">
+          <div class="panel-head">
+            <div><h2>Contas a pagar</h2><p>Despesas fixas e recorrentes do mês</p></div>
+            <button class="btn primary sm" data-open="billModal">＋ Nova conta</button>
+          </div>
+          <div class="bills-list" id="billsList"></div>
+        </article>
+        <article class="panel">
+          <div class="panel-head">
+            <div><h2>Orçamento por categoria</h2><p>Planejado versus realizado</p></div>
+            <button class="btn secondary sm" data-open="budgetModal">✎ Editar limites</button>
+          </div>
+          <div class="budget-list" id="budgetList"></div>
+        </article>
+      </div>
+
+      <article class="panel" style="margin-top:18px">
+        <div class="panel-head"><div><h2>Saídas do mês</h2><p>Todos os gastos lançados no período</p></div><button class="btn primary sm" id="newExpenseBtn">＋ Novo gasto</button></div>
+        <div class="transaction-list" id="monthExpensesList"></div>
+      </article>
+    </section>
+
+    <!-- ================= CONTAS & CARTÕES ================= -->
     <section class="page" id="accounts">
-      <div class="section-intro"><div><h2>Suas contas</h2><p>Saldos atualizados e consolidados.</p></div><button class="btn primary" data-open="accountModal">＋ Nova conta</button></div>
+      <div class="section-intro"><div><h2>Suas contas</h2><p>Saldo calculado a partir dos lançamentos.</p></div><button class="btn primary" data-open="accountModal">＋ Nova conta</button></div>
       <div class="account-grid" id="accountsGrid"></div>
-    </section>
-
-    <section class="page" id="cards">
-      <div class="section-intro"><div><h2>Cartões e faturas</h2><p>Acompanhe limites, vencimentos e parcelas.</p></div><button class="btn primary">＋ Novo cartão</button></div>
+      <div class="section-intro" style="margin-top:34px"><div><h2>Cartões de crédito</h2><p>Faturas em aberto, limites e vencimentos.</p></div><button class="btn primary" data-open="cardModal">＋ Novo cartão</button></div>
       <div class="cards-layout" id="cardsGrid"></div>
     </section>
 
-    <section class="page" id="budget">
-      <div class="section-intro"><div><h2>Orçamento mensal</h2><p>Planejado versus realizado em setembro.</p></div><button class="btn primary">＋ Criar limite</button></div>
-      <div class="budget-summary">
-        <article><small>ORÇAMENTO TOTAL</small><strong>R$ 12.000</strong></article>
-        <article><small>UTILIZADO</small><strong>R$ 7.940</strong></article>
-        <article><small>DISPONÍVEL</small><strong class="positive">R$ 4.060</strong></article>
+    <!-- ================= INVESTIMENTOS ================= -->
+    <section class="page" id="investments">
+      <div class="investment-hero">
+        <div><small>PATRIMÔNIO INVESTIDO</small><strong class="money" id="investmentTotal">R$ 0,00</strong><span id="investmentMonthNote"></span></div>
+        <div class="investment-stats">
+          <div><small>Total aportado</small><strong class="money" id="investedTotal">R$ 0</strong></div>
+          <div><small>Resultado acumulado</small><strong class="money" id="investResult">R$ 0</strong></div>
+          <div><small>Rentabilidade</small><strong id="investYield">0%</strong></div>
+        </div>
       </div>
-      <article class="panel budget-list" id="budgetList"></article>
+      <div class="section-intro"><div><h2>Contas de investimento</h2><p>Corretoras, CDBs, Tesouro, ações, fundos, cripto…</p></div><div class="btn-group"><button class="btn secondary" id="newContributionBtn">↑ Novo aporte</button><button class="btn primary" data-open="investmentModal">＋ Nova conta de investimento</button></div></div>
+      <div class="invest-grid" id="investmentsGrid"></div>
+      <article class="panel" style="margin-top:18px"><div class="panel-head"><div><h2>Histórico de movimentos</h2><p>Aportes, resgates e atualizações de valor</p></div></div><div id="contributionsList" class="transaction-list"></div></article>
     </section>
 
-    <section class="page" id="investments">
-      <div class="section-intro"><div><h2>Investimentos</h2><p>Controle simples de patrimônio e aportes.</p></div><button class="btn primary" id="updateInvestmentBtn">↻ Atualizar patrimônio</button></div>
-      <div class="investment-hero">
-        <div><small>PATRIMÔNIO INVESTIDO</small><strong id="investmentTotal">R$ 239.500,00</strong><span class="positive">+ R$ 3.000 em aportes este mês</span></div>
-        <div class="investment-stats"><div><small>Total aportado</small><strong>R$ 47.000</strong></div><div><small>Resultado acumulado</small><strong class="positive">+ R$ 6.500</strong></div></div>
+    <!-- ================= AJUSTES ================= -->
+    <section class="page" id="settings">
+      <div class="settings-grid">
+        <article class="panel settings-panel">
+          <div class="panel-head"><div><h2>☁ Sincronizar entre aparelhos</h2><p>Seus dados ficam no seu banco de dados Supabase (gratuito) e aparecem no computador e no celular.</p></div></div>
+          <div class="settings-body">
+            <div class="sync-status" id="syncStatus"></div>
+            <form id="syncForm" class="form-grid">
+              <label class="wide">URL do projeto Supabase<input name="url" placeholder="https://xxxx.supabase.co" autocomplete="off"></label>
+              <label class="wide">Chave pública (anon key)<input name="key" placeholder="eyJhbGciOi…" autocomplete="off"></label>
+              <label class="wide">Código de sincronização<input name="code" placeholder="Ex.: minha-frase-secreta-2026" autocomplete="off"><small>Use o mesmo código em todos os seus aparelhos. Ele funciona como senha dos seus dados.</small></label>
+              <div class="modal-actions wide">
+                <button type="button" class="btn secondary" id="syncDisconnect">Desconectar</button>
+                <button class="btn primary">Conectar e sincronizar</button>
+              </div>
+            </form>
+            <details class="setup-guide">
+              <summary>Como criar o banco de dados (5 minutos, grátis)</summary>
+              <ol>
+                <li>Acesse <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a>, crie uma conta e um projeto novo (plano Free).</li>
+                <li>No menu do projeto, abra <strong>SQL Editor</strong>, cole o código abaixo e clique em <strong>Run</strong>.</li>
+                <li>Em <strong>Project Settings → API</strong>, copie a <strong>Project URL</strong> e a chave <strong>anon public</strong>.</li>
+                <li>Cole aqui em cima, escolha um código de sincronização e clique em conectar.</li>
+                <li>No celular, abra o site, repita o passo 4 com os mesmos dados. Pronto: tudo no mesmo lugar.</li>
+              </ol>
+              <div class="code-block"><button type="button" class="copy-btn" id="copySql">Copiar SQL</button><pre id="sqlBlock"></pre></div>
+            </details>
+          </div>
+        </article>
+
+        <article class="panel settings-panel">
+          <div class="panel-head"><div><h2>📱 Usar como aplicativo</h2><p>Instale na tela inicial do celular para abrir como um app.</p></div></div>
+          <div class="settings-body">
+            <p class="hint"><strong>Android (Chrome):</strong> menu ⋮ → “Adicionar à tela inicial” ou “Instalar app”.</p>
+            <p class="hint"><strong>iPhone (Safari):</strong> botão Compartilhar → “Adicionar à Tela de Início”.</p>
+            <button class="btn primary" id="installBtn" hidden>⇩ Instalar aplicativo</button>
+          </div>
+        </article>
+
+        <article class="panel settings-panel">
+          <div class="panel-head"><div><h2>🏷 Categorias</h2><p>Personalize as categorias de gastos e receitas.</p></div><button class="btn secondary sm" id="addCategoryBtn">＋ Nova categoria</button></div>
+          <div class="settings-body"><div class="chips" id="categoryChips"></div></div>
+        </article>
+
+        <article class="panel settings-panel">
+          <div class="panel-head"><div><h2>💾 Backup e dados</h2><p>Exporte, importe ou limpe seus dados.</p></div></div>
+          <div class="settings-body btn-row">
+            <button class="btn secondary" id="exportBtn2">⇩ Exportar backup (JSON)</button>
+            <label class="btn secondary" for="restoreFile">⇧ Restaurar backup<input type="file" id="restoreFile" accept="application/json" hidden></label>
+            <button class="btn danger" id="resetBtn">Apagar todos os dados</button>
+          </div>
+        </article>
       </div>
-      <article class="panel"><div class="panel-head"><div><h2>Histórico de aportes</h2><p>Atualizações manuais recentes</p></div></div><div id="contributionsList"></div></article>
     </section>
   </main>
 
+  <!-- Barra inferior (celular) -->
+  <nav class="bottom-nav" id="bottomNav">
+    <button data-page="dashboard" class="active"><span>⌂</span>Início</button>
+    <button data-page="transactions"><span>↕</span>Lançamentos</button>
+    <button class="fab" id="fabBtn" aria-label="Nova movimentação">＋</button>
+    <button data-page="expenses"><span>◎</span>Gastos</button>
+    <button data-page="investments"><span>⌁</span>Investir</button>
+  </nav>
+  <button class="voice-fab" id="voiceFab" aria-label="Adicionar por voz">🎤</button>
+
+  <!-- ================= MODAIS ================= -->
   <dialog id="transactionModal">
     <form id="transactionForm">
-      <div class="modal-head"><div><h2>Nova movimentação</h2><p>Registre uma entrada, saída ou transferência.</p></div><button type="button" class="close-modal">×</button></div>
+      <div class="modal-head"><div><h2 id="txModalTitle">Nova movimentação</h2><p>Registre uma entrada, saída ou transferência.</p></div><button type="button" class="close-modal" aria-label="Fechar">×</button></div>
+      <input type="hidden" name="id">
       <div class="type-switch">
-        <label><input type="radio" name="type" value="expense" checked><span>Saída</span></label>
-        <label><input type="radio" name="type" value="income"><span>Entrada</span></label>
-        <label><input type="radio" name="type" value="transfer"><span>Transferência</span></label>
+        <label><input type="radio" name="type" value="expense" checked><span>↘ Saída</span></label>
+        <label><input type="radio" name="type" value="income"><span>↗ Entrada</span></label>
+        <label><input type="radio" name="type" value="transfer"><span>⇄ Transferência</span></label>
+      </div>
+      <div class="voice-hint" id="voiceHint" hidden></div>
+      <div class="form-grid">
+        <label class="wide">Descrição<input name="description" required placeholder="Ex.: Supermercado" autocomplete="off"></label>
+        <label>Valor (R$)<input name="amount" required type="number" inputmode="decimal" min="0.01" step="0.01" placeholder="0,00"></label>
+        <label>Data<input name="date" required type="date"></label>
+        <label>Categoria<select name="category" id="txCategory"></select></label>
+        <label id="sourceLabel">Pagar com<select name="source" id="txSource"></select></label>
+        <label id="destLabel" hidden>Conta de destino<select name="dest" id="txDest"></select></label>
+        <label id="installmentsLabel">Parcelas<select name="installments"><option value="1">À vista</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>10</option><option>12</option><option>18</option><option>24</option></select></label>
+        <label class="wide check-row"><input type="checkbox" name="recurring"><span>Repetir todo mês (criar conta fixa)</span></label>
+        <label class="wide">Observação<textarea name="note" rows="2" placeholder="Opcional"></textarea></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn danger-ghost" id="txDeleteBtn" hidden>Excluir</button><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="voiceModal">
+    <div class="voice-box">
+      <div class="modal-head"><div><h2>Adicionar por voz</h2><p>Fale algo como: “Gastei 45 reais no mercado hoje” ou “Recebi 3 mil de salário”.</p></div><button type="button" class="close-modal" aria-label="Fechar">×</button></div>
+      <div class="voice-visual" id="voiceVisual"><span></span><span></span><span></span><span></span><span></span></div>
+      <p class="voice-transcript" id="voiceTranscript">Toque no microfone e comece a falar…</p>
+      <div class="voice-examples">
+        <button type="button" class="chip">Gastei 32 reais de uber</button>
+        <button type="button" class="chip">Paguei 150 de luz no cartão</button>
+        <button type="button" class="chip">Recebi 4 mil de salário</button>
+        <button type="button" class="chip">Apliquei 500 reais em investimentos</button>
+      </div>
+      <div class="modal-actions center">
+        <button type="button" class="mic-big" id="micBtn" aria-label="Gravar">🎤</button>
+      </div>
+      <p class="hint" id="voiceSupport"></p>
+      <label class="wide voice-manual">Ou digite a frase<div class="inline-form"><input id="voiceText" placeholder="Ex.: paguei 80 reais na farmácia"><button type="button" class="btn primary" id="voiceParseBtn">Interpretar</button></div></label>
+    </div>
+  </dialog>
+
+  <dialog id="billModal">
+    <form id="billForm">
+      <div class="modal-head"><div><h2 id="billModalTitle">Nova conta a pagar</h2><p>Despesa fixa ou recorrente, como aluguel, luz ou assinatura.</p></div><button type="button" class="close-modal">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="wide">Descrição<input name="description" required placeholder="Ex.: Aluguel"></label>
+        <label>Valor (R$)<input name="amount" required type="number" inputmode="decimal" min="0.01" step="0.01"></label>
+        <label>Dia do vencimento<input name="dueDay" required type="number" min="1" max="31" value="10"></label>
+        <label>Categoria<select name="category" id="billCategory"></select></label>
+        <label>Pagar com<select name="source" id="billSource"></select></label>
+        <label class="wide check-row"><input type="checkbox" name="recurring" checked><span>Repete todo mês</span></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn danger-ghost" id="billDeleteBtn" hidden>Excluir</button><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar conta</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="budgetModal">
+    <form id="budgetForm">
+      <div class="modal-head"><div><h2>Limites de orçamento</h2><p>Defina quanto pretende gastar por categoria a cada mês.</p></div><button type="button" class="close-modal">×</button></div>
+      <div class="budget-form" id="budgetFields"></div>
+      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar limites</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="accountModal">
+    <form id="accountForm">
+      <div class="modal-head"><div><h2 id="accountModalTitle">Nova conta</h2><p>Conta corrente, poupança, carteira ou dinheiro.</p></div><button type="button" class="close-modal">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="wide">Nome<input name="name" required placeholder="Ex.: Nubank"></label>
+        <label>Tipo<select name="type"><option>Conta corrente</option><option>Conta digital</option><option>Poupança</option><option>Dinheiro</option><option>Outro</option></select></label>
+        <label>Saldo inicial (R$)<input name="initialBalance" type="number" inputmode="decimal" step="0.01" value="0"></label>
+        <label>Cor<input name="color" type="color" value="#1d7a55"></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn danger-ghost" id="accountDeleteBtn" hidden>Excluir</button><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar conta</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="cardModal">
+    <form id="cardForm">
+      <div class="modal-head"><div><h2 id="cardModalTitle">Novo cartão</h2><p>Controle limite, fechamento e vencimento da fatura.</p></div><button type="button" class="close-modal">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="wide">Nome<input name="name" required placeholder="Ex.: Nubank Platinum"></label>
+        <label>Bandeira<select name="brand"><option>VISA</option><option>MASTERCARD</option><option>ELO</option><option>AMEX</option><option>HIPERCARD</option><option>OUTRA</option></select></label>
+        <label>Final do cartão<input name="last" maxlength="4" inputmode="numeric" placeholder="0000"></label>
+        <label>Limite (R$)<input name="limit" type="number" inputmode="decimal" step="0.01" required></label>
+        <label>Dia do vencimento<input name="due" type="number" min="1" max="31" value="10" required></label>
+        <label>Dia do fechamento<input name="closing" type="number" min="1" max="31" value="3" required></label>
+        <label>Conta de pagamento<select name="accountId" id="cardAccount"></select></label>
+        <label>Cor<input name="color" type="color" value="#173c2c"></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn danger-ghost" id="cardDeleteBtn" hidden>Excluir</button><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar cartão</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="investmentModal">
+    <form id="investmentForm">
+      <div class="modal-head"><div><h2 id="investmentModalTitle">Nova conta de investimento</h2><p>Corretora, CDB, Tesouro Direto, ações, fundos, cripto…</p></div><button type="button" class="close-modal">×</button></div>
+      <input type="hidden" name="id">
+      <div class="form-grid">
+        <label class="wide">Nome<input name="name" required placeholder="Ex.: Tesouro Selic 2029"></label>
+        <label>Tipo<select name="type"><option>Renda fixa</option><option>Tesouro Direto</option><option>CDB / LCI / LCA</option><option>Ações</option><option>Fundos imobiliários</option><option>Fundos</option><option>Criptomoedas</option><option>Previdência</option><option>Poupança</option><option>Outro</option></select></label>
+        <label>Instituição<input name="institution" placeholder="Ex.: XP, Nubank, Rico"></label>
+        <label>Total já aportado (R$)<input name="invested" type="number" inputmode="decimal" step="0.01" value="0"></label>
+        <label>Valor atual (R$)<input name="current" type="number" inputmode="decimal" step="0.01" value="0"></label>
+        <label>Cor<input name="color" type="color" value="#1b6b4b"></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn danger-ghost" id="investmentDeleteBtn" hidden>Excluir</button><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="contributionModal">
+    <form id="contributionForm">
+      <div class="modal-head"><div><h2>Movimentar investimento</h2><p>Aporte, resgate ou atualização do valor atual.</p></div><button type="button" class="close-modal">×</button></div>
+      <div class="type-switch">
+        <label><input type="radio" name="kind" value="aporte" checked><span>↑ Aporte</span></label>
+        <label><input type="radio" name="kind" value="resgate"><span>↓ Resgate</span></label>
+        <label><input type="radio" name="kind" value="atualizacao"><span>↻ Atualizar valor</span></label>
       </div>
       <div class="form-grid">
-        <label class="wide">Descrição<input name="description" required placeholder="Ex.: Supermercado"></label>
-        <label>Valor<input name="amount" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
-        <label>Data<input name="date" required type="date"></label>
-        <label>Categoria<select name="category"><option>Alimentação</option><option>Moradia</option><option>Transporte</option><option>Lazer</option><option>Saúde</option><option>Compras</option><option>Assinaturas</option><option>Empresa</option><option>Investimentos</option><option>Receitas</option><option>Outros</option></select></label>
-        <label>Conta<select name="account"><option>Conta principal</option><option>Banco digital</option><option>Carteira</option><option>Investimentos</option></select></label>
-        <label class="wide">Observação<textarea name="note" rows="3" placeholder="Opcional"></textarea></label>
+        <label class="wide">Investimento<select name="investmentId" id="contribInvestment" required></select></label>
+        <label>Valor (R$)<input name="amount" type="number" inputmode="decimal" step="0.01" min="0.01" required></label>
+        <label>Data<input name="date" type="date" required></label>
+        <label class="wide" id="contribAccountLabel">Conta de origem / destino<select name="accountId" id="contribAccount"></select><small>Cria automaticamente a movimentação na conta.</small></label>
       </div>
-      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar movimentação</button></div>
+      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Confirmar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="goalModal">
+    <form id="goalForm">
+      <div class="modal-head"><div><h2>Meta de patrimônio</h2><p>Quanto você quer alcançar?</p></div><button type="button" class="close-modal">×</button></div>
+      <div class="form-grid"><label class="wide">Meta (R$)<input name="target" type="number" inputmode="decimal" step="0.01" min="1" required></label></div>
+      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar meta</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="categoryModal">
+    <form id="categoryForm">
+      <div class="modal-head"><div><h2>Nova categoria</h2></div><button type="button" class="close-modal">×</button></div>
+      <div class="form-grid">
+        <label class="wide">Nome<input name="name" required></label>
+        <label>Tipo<select name="kind"><option value="expense">Gasto</option><option value="income">Receita</option></select></label>
+        <label>Ícone (emoji)<input name="icon" maxlength="2" value="•"></label>
+        <label class="wide">Cor<input name="color" type="color" value="#6b9eb5"></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Adicionar</button></div>
     </form>
   </dialog>
 
   <dialog id="importModal">
     <form id="importForm">
-      <div class="modal-head"><div><h2>Importar fatura</h2><p>Envie um CSV com data, descrição, valor e categoria.</p></div><button type="button" class="close-modal">×</button></div>
-      <label class="dropzone" for="csvFile"><span>⇧</span><strong>Escolha seu arquivo CSV</strong><small>ou arraste e solte aqui</small><input id="csvFile" type="file" accept=".csv,text/csv" hidden></label>
-      <div class="import-example"><strong>Formato esperado</strong><code>data,descricao,valor,categoria,conta</code></div>
+      <div class="modal-head"><div><h2>Importar CSV</h2><p>Envie um CSV com data, descrição, valor, categoria e conta.</p></div><button type="button" class="close-modal">×</button></div>
+      <label class="dropzone" for="csvFile"><span>⇧</span><strong>Escolha seu arquivo CSV</strong><small id="csvName">ou arraste e solte aqui</small><input id="csvFile" type="file" accept=".csv,text/csv" hidden></label>
+      <div class="import-example"><strong>Formato esperado</strong><code>data,descricao,valor,categoria,conta</code><small>Valores positivos = saídas · negativos = entradas</small></div>
       <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Importar lançamentos</button></div>
     </form>
   </dialog>
 
+  <dialog id="confirmModal" class="confirm">
+    <div class="voice-box">
+      <h2 id="confirmTitle">Confirmar</h2>
+      <p id="confirmText"></p>
+      <div class="modal-actions"><button type="button" class="btn secondary" id="confirmNo">Cancelar</button><button type="button" class="btn danger" id="confirmYes">Confirmar</button></div>
+    </div>
+  </dialog>
+
   <div class="toast" id="toast"></div>
-  <script src="app.js"></script>
+  <script src="config.js"></script>
+  <script type="module">
+    try{const m=await import("https://cdn.jsdelivr.net/npm/motion@12/+esm");window.__motion=m}catch(e){window.__motion=null}
+  </script>
+  <script src="app.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,16 @@
+{
+  "name": "Meu Caixa — Gestão Financeira",
+  "short_name": "Meu Caixa",
+  "description": "Controle de gastos, contas, cartões e investimentos, sincronizado entre seus aparelhos.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f5f7f7",
+  "theme_color": "#153a2b",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
