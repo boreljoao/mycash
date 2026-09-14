@@ -23,7 +23,7 @@
     </nav>
     <div class="sidebar-bottom">
       <button class="nav-item" id="exportBtn"><span>⇩</span> Exportar dados</button>
-      <button class="profile"><span class="avatar">JB</span><span><strong>João Borel</strong><small>Conta pessoal</small></span><span>⋯</span></button>
+      <button class="profile"><span class="avatar">MC</span><span><strong>Minha conta</strong><small>Conta pessoal</small></span><span>⋯</span></button>
     </div>
   </aside>
 
@@ -45,19 +45,19 @@
       <div class="hero-grid">
         <article class="balance-card">
           <div class="card-head"><span>Patrimônio total</span><button class="ghost" id="toggleBalance">◉</button></div>
-          <div class="balance" data-money="463200">R$ 463.200,00</div>
-          <div class="change positive">↗ R$ 48.300 <span>nos últimos 30 dias</span></div>
+          <div class="balance" data-money="128400">R$ 128.400,00</div>
+          <div class="change positive">↗ R$ 8.400 <span>nos últimos 30 dias</span></div>
           <div class="balance-breakdown">
-            <div><small>Caixa disponível</small><strong>R$ 223.700</strong></div>
+            <div><small>Caixa disponível</small><strong>R$ 74.900</strong></div>
             <div><small>Investimentos</small><strong>R$ 239.500</strong></div>
           </div>
         </article>
         <article class="projection-card">
           <div class="card-head"><span>Projeção do patrimônio</span><span class="pill">12 meses</span></div>
-          <div class="projection-value">R$ 961.000</div>
+          <div class="projection-value">R$ 256.000</div>
           <p>Considerando sua geração média atual</p>
           <div class="progress"><i style="width:68%"></i></div>
-          <div class="progress-labels"><span>Hoje · R$ 463 mil</span><span>Meta · R$ 1 mi</span></div>
+          <div class="progress-labels"><span>Hoje · R$ 128 mil</span><span>Meta · R$ 250 mil</span></div>
         </article>
       </div>
 
@@ -78,7 +78,7 @@
         <article class="panel categories-panel">
           <div class="panel-head"><div><h2>Gastos por categoria</h2><p>Setembro de 2026</p></div><button class="ghost">•••</button></div>
           <div class="donut-area">
-            <div class="donut"><div><strong>R$ 18,7k</strong><small>Total</small></div></div>
+            <div class="donut"><div><strong>R$ 7,9k</strong><small>Total</small></div></div>
             <div class="legend" id="categoryLegend"></div>
           </div>
         </article>
@@ -117,9 +117,9 @@
     <section class="page" id="budget">
       <div class="section-intro"><div><h2>Orçamento mensal</h2><p>Planejado versus realizado em setembro.</p></div><button class="btn primary">＋ Criar limite</button></div>
       <div class="budget-summary">
-        <article><small>ORÇAMENTO TOTAL</small><strong>R$ 25.000</strong></article>
-        <article><small>UTILIZADO</small><strong>R$ 18.740</strong></article>
-        <article><small>DISPONÍVEL</small><strong class="positive">R$ 6.260</strong></article>
+        <article><small>ORÇAMENTO TOTAL</small><strong>R$ 12.000</strong></article>
+        <article><small>UTILIZADO</small><strong>R$ 7.940</strong></article>
+        <article><small>DISPONÍVEL</small><strong class="positive">R$ 4.060</strong></article>
       </div>
       <article class="panel budget-list" id="budgetList"></article>
     </section>
@@ -127,8 +127,8 @@
     <section class="page" id="investments">
       <div class="section-intro"><div><h2>Investimentos</h2><p>Controle simples de patrimônio e aportes.</p></div><button class="btn primary" id="updateInvestmentBtn">↻ Atualizar patrimônio</button></div>
       <div class="investment-hero">
-        <div><small>PATRIMÔNIO INVESTIDO</small><strong id="investmentTotal">R$ 239.500,00</strong><span class="positive">+ R$ 20.000 em aportes este mês</span></div>
-        <div class="investment-stats"><div><small>Total aportado</small><strong>R$ 207.000</strong></div><div><small>Resultado acumulado</small><strong class="positive">+ R$ 32.500</strong></div></div>
+        <div><small>PATRIMÔNIO INVESTIDO</small><strong id="investmentTotal">R$ 239.500,00</strong><span class="positive">+ R$ 3.000 em aportes este mês</span></div>
+        <div class="investment-stats"><div><small>Total aportado</small><strong>R$ 47.000</strong></div><div><small>Resultado acumulado</small><strong class="positive">+ R$ 6.500</strong></div></div>
       </div>
       <article class="panel"><div class="panel-head"><div><h2>Histórico de aportes</h2><p>Atualizações manuais recentes</p></div></div><div id="contributionsList"></div></article>
     </section>
@@ -147,7 +147,7 @@
         <label>Valor<input name="amount" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
         <label>Data<input name="date" required type="date"></label>
         <label>Categoria<select name="category"><option>Alimentação</option><option>Moradia</option><option>Transporte</option><option>Lazer</option><option>Saúde</option><option>Compras</option><option>Assinaturas</option><option>Empresa</option><option>Investimentos</option><option>Receitas</option><option>Outros</option></select></label>
-        <label>Conta<select name="account"><option>Mercado Pago</option><option>Itaú</option><option>Carteira</option><option>Investimentos</option></select></label>
+        <label>Conta<select name="account"><option>Conta principal</option><option>Banco digital</option><option>Carteira</option><option>Investimentos</option></select></label>
         <label class="wide">Observação<textarea name="note" rows="3" placeholder="Opcional"></textarea></label>
       </div>
       <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar movimentação</button></div>
