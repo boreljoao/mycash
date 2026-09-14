@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <title>Meu Caixa — Gestão Financeira</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">M</span><span>meucaixa</span></a>
+    <nav id="nav">
+      <button class="nav-item active" data-page="dashboard"><span>⌂</span> Meu Caixa</button>
+      <button class="nav-item" data-page="transactions"><span>↕</span> Movimentações</button>
+      <button class="nav-item" data-page="accounts"><span>▣</span> Contas</button>
+      <button class="nav-item" data-page="cards"><span>▱</span> Cartões</button>
+      <button class="nav-item" data-page="budget"><span>◎</span> Orçamento</button>
+      <button class="nav-item" data-page="investments"><span>⌁</span> Investimentos</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="nav-item" id="exportBtn"><span>⇩</span> Exportar dados</button>
+      <button class="profile"><span class="avatar">JB</span><span><strong>João Borel</strong><small>Conta pessoal</small></span><span>⋯</span></button>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <button class="mobile-menu" id="menuBtn">☰</button>
+      <div>
+        <p class="eyebrow">VISÃO GERAL</p>
+        <h1 id="pageTitle">Meu Caixa</h1>
+      </div>
+      <div class="top-actions">
+        <button class="icon-btn" aria-label="Notificações">◌<span class="dot"></span></button>
+        <button class="btn secondary" id="importBtn">⇧ Importar fatura</button>
+        <button class="btn primary" id="newTransactionBtn">＋ Nova movimentação</button>
+      </div>
+    </header>
+
+    <section class="page active" id="dashboard">
+      <div class="hero-grid">
+        <article class="balance-card">
+          <div class="card-head"><span>Patrimônio total</span><button class="ghost" id="toggleBalance">◉</button></div>
+          <div class="balance" data-money="463200">R$ 463.200,00</div>
+          <div class="change positive">↗ R$ 48.300 <span>nos últimos 30 dias</span></div>
+          <div class="balance-breakdown">
+            <div><small>Caixa disponível</small><strong>R$ 223.700</strong></div>
+            <div><small>Investimentos</small><strong>R$ 239.500</strong></div>
+          </div>
+        </article>
+        <article class="projection-card">
+          <div class="card-head"><span>Projeção do patrimônio</span><span class="pill">12 meses</span></div>
+          <div class="projection-value">R$ 961.000</div>
+          <p>Considerando sua geração média atual</p>
+          <div class="progress"><i style="width:68%"></i></div>
+          <div class="progress-labels"><span>Hoje · R$ 463 mil</span><span>Meta · R$ 1 mi</span></div>
+        </article>
+      </div>
+
+      <div class="metrics" id="metrics"></div>
+
+      <div class="content-grid">
+        <article class="panel chart-panel">
+          <div class="panel-head">
+            <div><h2>Evolução do caixa</h2><p>Saldo consolidado das suas contas</p></div>
+            <select id="chartPeriod"><option value="6">Últimos 6 meses</option><option value="12">Últimos 12 meses</option></select>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-summary"><strong>R$ 223.700</strong><span class="positive">+21,4%</span></div>
+            <svg id="cashChart" viewBox="0 0 700 240" role="img" aria-label="Gráfico de evolução do caixa"></svg>
+          </div>
+        </article>
+
+        <article class="panel categories-panel">
+          <div class="panel-head"><div><h2>Gastos por categoria</h2><p>Setembro de 2026</p></div><button class="ghost">•••</button></div>
+          <div class="donut-area">
+            <div class="donut"><div><strong>R$ 18,7k</strong><small>Total</small></div></div>
+            <div class="legend" id="categoryLegend"></div>
+          </div>
+        </article>
+      </div>
+
+      <div class="content-grid lower">
+        <article class="panel transactions-panel">
+          <div class="panel-head"><div><h2>Movimentações recentes</h2><p>Últimos lançamentos registrados</p></div><button class="link-btn" data-go="transactions">Ver todas →</button></div>
+          <div class="transaction-list" id="recentTransactions"></div>
+        </article>
+        <article class="panel bills-panel">
+          <div class="panel-head"><div><h2>Próximos compromissos</h2><p>Faturas e contas a vencer</p></div></div>
+          <div id="upcomingBills"></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="page" id="transactions">
+      <div class="section-toolbar">
+        <div class="filters"><input id="searchInput" placeholder="Buscar movimentação..."><select id="typeFilter"><option value="">Todos os tipos</option><option value="income">Entradas</option><option value="expense">Saídas</option><option value="transfer">Transferências</option></select></div>
+        <span class="results-count" id="resultsCount"></span>
+      </div>
+      <article class="panel data-panel"><div class="table-scroll"><table><thead><tr><th>Descrição</th><th>Categoria</th><th>Conta</th><th>Data</th><th class="right">Valor</th><th></th></tr></thead><tbody id="transactionsTable"></tbody></table></div></article>
+    </section>
+
+    <section class="page" id="accounts">
+      <div class="section-intro"><div><h2>Suas contas</h2><p>Saldos atualizados e consolidados.</p></div><button class="btn primary" data-open="accountModal">＋ Nova conta</button></div>
+      <div class="account-grid" id="accountsGrid"></div>
+    </section>
+
+    <section class="page" id="cards">
+      <div class="section-intro"><div><h2>Cartões e faturas</h2><p>Acompanhe limites, vencimentos e parcelas.</p></div><button class="btn primary">＋ Novo cartão</button></div>
+      <div class="cards-layout" id="cardsGrid"></div>
+    </section>
+
+    <section class="page" id="budget">
+      <div class="section-intro"><div><h2>Orçamento mensal</h2><p>Planejado versus realizado em setembro.</p></div><button class="btn primary">＋ Criar limite</button></div>
+      <div class="budget-summary">
+        <article><small>ORÇAMENTO TOTAL</small><strong>R$ 25.000</strong></article>
+        <article><small>UTILIZADO</small><strong>R$ 18.740</strong></article>
+        <article><small>DISPONÍVEL</small><strong class="positive">R$ 6.260</strong></article>
+      </div>
+      <article class="panel budget-list" id="budgetList"></article>
+    </section>
+
+    <section class="page" id="investments">
+      <div class="section-intro"><div><h2>Investimentos</h2><p>Controle simples de patrimônio e aportes.</p></div><button class="btn primary" id="updateInvestmentBtn">↻ Atualizar patrimônio</button></div>
+      <div class="investment-hero">
+        <div><small>PATRIMÔNIO INVESTIDO</small><strong id="investmentTotal">R$ 239.500,00</strong><span class="positive">+ R$ 20.000 em aportes este mês</span></div>
+        <div class="investment-stats"><div><small>Total aportado</small><strong>R$ 207.000</strong></div><div><small>Resultado acumulado</small><strong class="positive">+ R$ 32.500</strong></div></div>
+      </div>
+      <article class="panel"><div class="panel-head"><div><h2>Histórico de aportes</h2><p>Atualizações manuais recentes</p></div></div><div id="contributionsList"></div></article>
+    </section>
+  </main>
+
+  <dialog id="transactionModal">
+    <form id="transactionForm">
+      <div class="modal-head"><div><h2>Nova movimentação</h2><p>Registre uma entrada, saída ou transferência.</p></div><button type="button" class="close-modal">×</button></div>
+      <div class="type-switch">
+        <label><input type="radio" name="type" value="expense" checked><span>Saída</span></label>
+        <label><input type="radio" name="type" value="income"><span>Entrada</span></label>
+        <label><input type="radio" name="type" value="transfer"><span>Transferência</span></label>
+      </div>
+      <div class="form-grid">
+        <label class="wide">Descrição<input name="description" required placeholder="Ex.: Supermercado"></label>
+        <label>Valor<input name="amount" required type="number" min="0.01" step="0.01" placeholder="0,00"></label>
+        <label>Data<input name="date" required type="date"></label>
+        <label>Categoria<select name="category"><option>Alimentação</option><option>Moradia</option><option>Transporte</option><option>Lazer</option><option>Saúde</option><option>Compras</option><option>Assinaturas</option><option>Empresa</option><option>Investimentos</option><option>Receitas</option><option>Outros</option></select></label>
+        <label>Conta<select name="account"><option>Mercado Pago</option><option>Itaú</option><option>Carteira</option><option>Investimentos</option></select></label>
+        <label class="wide">Observação<textarea name="note" rows="3" placeholder="Opcional"></textarea></label>
+      </div>
+      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Salvar movimentação</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="importModal">
+    <form id="importForm">
+      <div class="modal-head"><div><h2>Importar fatura</h2><p>Envie um CSV com data, descrição, valor e categoria.</p></div><button type="button" class="close-modal">×</button></div>
+      <label class="dropzone" for="csvFile"><span>⇧</span><strong>Escolha seu arquivo CSV</strong><small>ou arraste e solte aqui</small><input id="csvFile" type="file" accept=".csv,text/csv" hidden></label>
+      <div class="import-example"><strong>Formato esperado</strong><code>data,descricao,valor,categoria,conta</code></div>
+      <div class="modal-actions"><button type="button" class="btn secondary close-modal">Cancelar</button><button class="btn primary">Importar lançamentos</button></div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
